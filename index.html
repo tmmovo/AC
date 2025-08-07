@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>漫展扩列 - 寻找同好伙伴</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --black: #0f0f0f;
+            --dark-gray: #1a1a1a;
+            --mid-gray: #333333;
+            --light-gray: #4d4d4d;
+            --accent: #f50057;
+            --text: #f0f0f0;
+            --success: #4CAF50;
+            --warning: #FFC107;
+            --danger: #F44336;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--black);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* 导航栏样式 */
+        .navbar {
+            background-color: rgba(10, 10, 10, 0.95);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--accent);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo i {
+            margin-right: 10px;
+            color: var(--accent);
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 25px;
+        }
+        
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: color 0.3s;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        
+        .nav-links a:hover {
+            color: var(--accent);
+            background: rgba(245, 0, 87, 0.1);
+        }
+        
+        .nav-links a.active {
+            color: var(--accent);
+            background: rgba(245, 0, 87, 0.15);
+        }
+        
+        /* 页面内容区 */
+        .page {
+            display: none;
+            padding: 100px 0 50px;
+        }
+        
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .page-title {
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            color: var(--accent);
+            text-align: center;
+            position: relative;
+        }
+        
+        .page-title::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 3px;
+            background: var(--accent);
+            margin: 15px auto;
+            border-radius: 2px;
+        }
+        
+        /* 倒计时区域 */
+        .countdown-section {
+            background-color: var(--dark-gray);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin-bottom: 50px;
+        }
+        
+        .next-event-info {
+            margin-bottom: 30px;
+        }
+        
+        .event-name {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+        
+        .event-details {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .event-detail {
+            display: flex;
+            align-items: center;
+            font-size: 1.1rem;
+        }
+        
+        .event-detail i {
+            margin-right: 10px;
+            color: var(--accent);
+            font-size: 1.2rem;
+        }
+        
+        .countdown-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 25px;
+            margin: 40px 0;
+        }
+        
+        .countdown-item {
+            background-color: rgba(0, 0, 0, 0.4);
+            padding: 20px 15px;
+            border-radius: 10px;
+            min-width: 100px;
+            text-align: center;
+            border: 1px solid var(--light-gray);
+        }
+        
+        .countdown-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--accent);
+            line-height: 1;
+        }
+        
+        .countdown-label {
+            font-size: 1rem;
+            margin-top: 10px;
+            color: var(--text);
+            opacity: 0.7;
+        }
+        
+        /* 扩列通道 */
+        .qq-section {
+            margin-top: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(245,0,87,0.1) 0%, rgba(15,15,15,0.8) 100%);
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(245, 0, 87, 0.3);
+            display: none;
+        }
+        
+        .qq-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+        
+        .qq-info {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        
+        .qq-card {
+            background: var(--dark-gray);
+            padding: 25px;
+            border-radius: 12px;
+            min-width: 250px;
+            border: 1px solid var(--mid-gray);
+            transition: all 0.3s ease;
+        }
+        
+        .qq-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(245, 0, 87, 0.2);
+            border-color: var(--accent);
+        }
+        
+        .qq-card i {
+            font-size: 3rem;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+        
+        .qq-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 10px 0;
+            letter-spacing: 1px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--light-gray);
+        }
+        
+        .qq-note {
+            font-size: 1rem;
+            margin-top: 15px;
+            opacity: 0.8;
+        }
+        
+        .copy-btn {
+            margin-top: 15px;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+        
+        .copy-btn:hover {
+            background-color: #d5004e;
+        }
+        
+        /* 活动卡片 */
+        .events-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+        }
+        
+        .event-card {
+            background-color: var(--dark-gray);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid var(--mid-gray);
+            position: relative;
+        }
+        
+        .event-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px rgba(245, 0, 87, 0.2);
+        }
+        
+        .event-card-header {
+            padding: 20px 20px 15px;
+            border-bottom: 1px solid var(--mid-gray);
+        }
+        
+        .event-card-body {
+            padding: 20px;
+        }
+        
+        .event-title {
+            font-size: 1.5rem;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+        
+        .event-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+        
+        .event-info i {
+            width: 24px;
+            color: var(--accent);
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .event-status {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        
+        .status-upcoming {
+            background-color: rgba(33, 150, 243, 0.2);
+            border: 1px solid #2196F3;
+            color: #2196F3;
+        }
+        
+        .status-active {
+            background-color: rgba(76, 175, 80, 0.2);
+            border: 1px solid #4CAF50;
+            color: #4CAF50;
+        }
+        
+        .status-past {
+            background-color: rgba(244, 67, 54, 0.2);
+            border: 1px solid #F44336;
+            color: #F44336;
+        }
+        
+        /* 友链页面 */
+        .friend-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .friend-card {
+            background-color: var(--dark-gray);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid var(--mid-gray);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        
+        .friend-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            border-color: var(--accent);
+        }
+        
+        .friend-avatar {
+			width: 60px;
+			height: 60px;
+			border-radius: 50%;
+			margin-right: 20px;
+			background-color: var(--mid-gray);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			overflow: hidden;
+			flex-shrink: 0;
+		}
+    
+		.friend-avatar img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+        
+        .friend-info {
+            flex-grow: 1;
+        }
+        
+        .friend-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .friend-desc {
+            font-size: 0.95rem;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+        
+        .friend-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .friend-link i {
+            margin-right: 5px;
+        }
+        
+        .friend-link:hover {
+            text-decoration: underline;
+        }
+		
+		.friend-card {
+		    background-color: var(--dark-gray);
+		    border-radius: 12px;
+		    padding: 25px;
+		    border: 1px solid var(--mid-gray);
+		    transition: all 0.3s ease;
+		    display: flex;
+		    align-items: center;
+		    position: relative;
+		}
+		
+		.friend-card:hover {
+		    transform: translateY(-5px);
+		    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+		    border-color: #ff3333; /* 悬停时使用亮红色边框 */
+		}
+		
+		/* 友链名称和描述 */
+		.friend-name {
+		    font-size: 1.3rem;
+		    font-weight: 600;
+		    margin-bottom: 5px;
+		    color: #ff5555; /* 名称使用亮红色 */
+		}
+		
+		.friend-desc {
+		    font-size: 0.95rem;
+		    color: #ff8888; /* 描述使用浅粉色提高可读性 */
+		    margin-bottom: 10px;
+		}
+		
+		/* 友链链接样式 */
+		.friend-link {
+		    color: #ff3333; /* 链接使用鲜红色 */
+		    text-decoration: none;
+		    font-size: 0.9rem;
+		    display: flex;
+		    align-items: center;
+		    transition: all 0.3s ease;
+		}
+		
+		.friend-link i {
+		    margin-right: 5px;
+		    color: #ff3333;
+		}
+		
+		.friend-link:hover {
+		    color: #ff7777; /* 悬停时变亮 */
+		    text-decoration: underline;
+		}
+        
+        /* 页脚样式 */
+        footer {
+            background-color: var(--dark-gray);
+            padding: 30px 0;
+            margin-top: 50px;
+            border-top: 1px solid var(--mid-gray);
+        }
+        
+        .footer-content {
+            text-align: center;
+            font-size: 1rem;
+            opacity: 0.7;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                font-size: 0.9rem;
+            }
+            
+            .nav-links li {
+                margin-left: 15px;
+            }
+            
+            .countdown-item {
+                min-width: 80px;
+                padding: 15px 10px;
+            }
+            
+            .countdown-number {
+                font-size: 2.5rem;
+            }
+            
+            .events-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .friend-links {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="#" class="logo" data-page="home">
+                <i class="fas fa-users"></i>
+                <span>扩列.我爱你</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="#" class="nav-link active" data-page="home">主页</a></li>
+                <li><a href="#" class="nav-link" data-page="events">漫展列表</a></li>
+                <li><a href="#" class="nav-link" data-page="friends">友链</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主页 -->
+    <section id="home" class="page active">
+        <div class="container">
+            <h1 class="page-title">近期漫展</h1>
+            
+            <!-- 倒计时区域 -->
+            <div class="countdown-section">
+                <div class="next-event-info">
+                    <div class="event-name" id="nextEventName">暂无计划</div>
+                    <div class="event-details">
+                        <div class="event-detail">
+                            <i class="fas fa-calendar"></i>
+                            <span id="nextEventDates">暂无计划</span>
+                        </div>
+                        <div class="event-detail">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span id="nextEventLocation">暂无计划</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="countdown-container" id="countdown">
+                    <div class="countdown-item">
+                        <div class="countdown-number" id="days">00</div>
+                        <div class="countdown-label">天</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div class="countdown-number" id="hours">00</div>
+                        <div class="countdown-label">时</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div class="countdown-number" id="minutes">00</div>
+                        <div class="countdown-label">分</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div class="countdown-number" id="seconds">00</div>
+                        <div class="countdown-label">秒</div>
+                    </div>
+                </div>
+                
+                <!-- 扩列通道 -->
+                <div class="qq-section" id="qqSection">
+                    <h2 class="qq-title">扩列通道已开启!</h2>
+                    <p>正在参加或即将参加这个漫展？快来加我好友吧！</p>
+                    
+                    <div class="qq-info">
+                        <div class="qq-card">
+                            <i class="fab fa-qq"></i>
+                            <div class="qq-number" id="qqNumber">1708039100</div>
+                            <div class="qq-note">点击下方按钮复制QQ号</div>
+                            <button class="copy-btn" id="copyQQ">
+                                <i class="fas fa-copy"></i> 复制QQ号
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 活动分类卡片 -->
+            <h2 class="page-title">全部活动</h2>
+            <div class="events-container" id="homeEvents">
+                <!-- JS生成最近活动 -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 活动列表页 -->
+    <section id="events" class="page">
+        <div class="container">
+            <h1 class="page-title">漫展列表</h1>
+            <div class="events-container" id="allEvents">
+                <!-- JS生成所有活动 -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 友链页面 -->
+    <section id="friends" class="page">
+        <div class="container">
+            <h1 class="page-title">我的好友</h1>
+            <div class="friend-links" id="friendsList">
+                <!-- JS生成好友列表 -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                © 2025 扩列.我爱你 · QQ扩列 · 漫展交友
+            </div>
+        </div>
+    </footer>
+
+    <!-- 引入数据文件 -->
+    <script src="source/data.js"></script>
+    
+    <script>
+        // 当从外部引入的data.js加载完成后，开始处理数据
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取页面元素
+            const pages = document.querySelectorAll('.page');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            // 导航切换功能
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetPage = this.getAttribute('data-page');
+                    
+                    // 更新活动链接状态
+                    navLinks.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // 显示目标页面
+                    pages.forEach(page => {
+                        page.classList.remove('active');
+                        if(page.id === targetPage) {
+                            page.classList.add('active');
+                        }
+                    });
+                });
+            });
+            
+            // 首页事件处理函数
+            function renderHomeEvents() {
+                const now = new Date();
+                
+                // 即将到来的活动（未来14天内）
+                const upcomingEvents = events.filter(event => {
+                    const startDate = new Date(event.startDate);
+                    return startDate > now && (startDate - now) <= (14 * 24 * 60 * 60 * 1000);
+                }).slice(0, 4); // 最多显示4个
+                
+                const container = document.getElementById('homeEvents');
+                container.innerHTML = '';
+                
+                upcomingEvents.forEach(event => {
+                    const startDate = new Date(event.startDate);
+                    const endDate = new Date(event.endDate);
+                    
+                    const eventElement = document.createElement('div');
+                    eventElement.className = 'event-card';
+                    eventElement.innerHTML = `
+                        <div class="event-card-header">
+                            <h3 class="event-title">${event.name}</h3>
+                        </div>
+                        <div class="event-card-body">
+                            <div class="event-info">
+                                <i class="fas fa-calendar"></i>
+                                <span>${formatDate(startDate)} - ${formatDate(endDate)}</span>
+                            </div>
+                            <div class="event-info">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>${event.location}</span>
+                            </div>
+                            <div class="event-info">
+                                <i class="fas fa-info-circle"></i>
+                                <span>${event.note || '详情请咨询主办方'}</span>
+                            </div>
+                        </div>
+                        <div class="event-status status-upcoming">即将开始</div>
+                    `;
+                    
+                    container.appendChild(eventElement);
+                });
+            }
+            
+            // 活动列表页渲染
+            function renderEventsPage() {
+                const now = new Date();
+                const container = document.getElementById('allEvents');
+                container.innerHTML = '';
+                
+                // 按开始日期排序
+                const sortedEvents = [...events].sort((a, b) => {
+                    return new Date(a.startDate) - new Date(b.startDate);
+                });
+                
+                sortedEvents.forEach(event => {
+                    const startDate = new Date(event.startDate);
+                    const endDate = new Date(event.endDate);
+                    let statusClass = 'status-upcoming';
+                    let statusText = '即将开始';
+                    
+                    if (now > endDate) {
+                        statusClass = 'status-past';
+                        statusText = '已结束';
+                    } else if (now >= startDate && now <= endDate) {
+                        statusClass = 'status-active';
+                        statusText = '进行中';
+                    }
+                    
+                    const eventElement = document.createElement('div');
+                    eventElement.className = 'event-card';
+                    eventElement.innerHTML = `
+                        <div class="event-card-header">
+                            <h3 class="event-title">${event.name}</h3>
+                        </div>
+                        <div class="event-card-body">
+                            <div class="event-info">
+                                <i class="fas fa-calendar"></i>
+                                <span>${formatDate(startDate)} - ${formatDate(endDate)}</span>
+                            </div>
+                            <div class="event-info">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>${event.location}</span>
+                            </div>
+                            <div class="event-info">
+                                <i class="fas fa-info-circle"></i>
+                                <span>${event.note || '详情请咨询主办方'}</span>
+                            </div>
+                        </div>
+                        <div class="event-status ${statusClass}">${statusText}</div>
+                    `;
+                    
+                    container.appendChild(eventElement);
+                });
+            }
+            
+            // 友链页面渲染
+            function renderFriendsPage() {
+                    const container = document.getElementById('friendsList');
+                    container.innerHTML = '';
+                    
+                    const friends = [
+                        { 
+                            name: '主站-凨狐的小窝', 
+                            desc: '主站-凨狐的小窝', 
+                            link: 'https://furrys.top', 
+                            platform: 'Website',
+                            avatar: 'source/sqarenewater.jpg'  // 添加图片URL
+                        },
+                        { 
+                            name: 'fishcpy的小破站', 
+                            desc: '非淡泊无以明志，非宁静无以致远', 
+                            link: 'https://blog.fis.ink', 
+                            platform: 'Website',
+                            avatar: 'https://www.fis.ink/img/logo.png'  // 添加图片URL
+                        }
+                    ];
+                    
+                    friends.forEach(friend => {
+                        const friendElement = document.createElement('a');
+                        friendElement.href = friend.link;
+                        friendElement.target = "_blank";
+                        friendElement.className = "friend-card";
+                        friendElement.innerHTML = `
+                            <div class="friend-avatar">
+                                <!-- 替换图标为图片 -->
+                                <img src="${friend.avatar}" alt="${friend.name}">
+                            </div>
+                            <div class="friend-info">
+                                <h4 class="friend-name">${friend.name}</h4>
+                                <p class="friend-desc">${friend.desc}</p>
+                                <div class="friend-link">
+                                    <i class="fas fa-external-link-alt"></i>
+                                    <span>访问${friend.platform}主页</span>
+                                </div>
+                            </div>
+                        `;
+                        
+                        container.appendChild(friendElement);
+                    });
+                }
+            
+            // 日期格式化函数
+            function formatDate(date) {
+                return `${date.getFullYear()}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getDate().toString().padStart(2, '0')}`;
+            }
+            
+            // 计算并显示倒计时
+            function updateCountdown() {
+                const now = new Date();
+                
+                // 找到下一个活动
+                let nextEvent = null;
+                for (const event of events) {
+                    const startDate = new Date(event.startDate);
+                    if (startDate > now) {
+                        nextEvent = event;
+                        break;
+                    }
+                }
+                
+                if (nextEvent) {
+                    const eventStart = new Date(nextEvent.startDate);
+                    
+                    // 更新事件信息
+                    document.getElementById('nextEventName').textContent = nextEvent.name;
+                    document.getElementById('nextEventDates').textContent = `日期：${formatDate(eventStart)}`;
+                    document.getElementById('nextEventLocation').textContent = `地点：${nextEvent.location}`;
+                    document.getElementById('qqNumber').textContent = nextEvent.qq;
+                    
+                    // 检查倒计时是否结束（活动开始）
+                    const diffTime = eventStart - now;
+                    
+                    if (diffTime <= 0) {
+                        // 活动已经开始
+                        document.getElementById('countdown').innerHTML = `
+                            <div class="countdown-item" style="min-width: 250px;">
+                                <div class="countdown-number" style="font-size: 2rem;">活动已开始!</div>
+                                <div class="countdown-label">快来现场找我要扩列吧！</div>
+                            </div>
+                        `;
+                        
+                        // 显示扩列通道
+                        document.getElementById('qqSection').style.display = 'block';
+                    } else {
+                        // 计算时间差
+                        const days = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                        const hours = Math.floor((diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const minutes = Math.floor((diffTime % (1000 * 60 * 60)) / (1000 * 60));
+                        const seconds = Math.floor((diffTime % (1000 * 60)) / 1000);
+                        
+                        // 更新倒计时显示
+                        document.getElementById('days').textContent = days.toString().padStart(2, '0');
+                        document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+                        document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+                        document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+                        
+                        // 如果是在活动当天但还没开始，显示扩列通道
+                        const isEventDay = (now.getDate() === eventStart.getDate() && 
+                                          now.getMonth() === eventStart.getMonth() && 
+                                          now.getFullYear() === eventStart.getFullYear());
+                                          
+                        if (isEventDay && days === 0 && hours < 24) {
+                            document.getElementById('qqSection').style.display = 'block';
+                        } else {
+                            document.getElementById('qqSection').style.display = 'none';
+                        }
+                    }
+                } else {
+                    // 没有更多活动
+                    document.getElementById('countdown').innerHTML = `
+                        <div class="countdown-item" style="min-width: 300px;">
+                            <div class="countdown-number" style="font-size: 2rem;">暂无未来活动</div>
+                            <div class="countdown-label">请关注后续漫展信息更新</div>
+                        </div>
+                    `;
+                    document.getElementById('qqSection').style.display = 'none';
+                }
+                
+                // 1秒后再次更新
+                setTimeout(updateCountdown, 1000);
+            }
+            
+            // 复制QQ号功能
+            document.getElementById('copyQQ').addEventListener('click', function() {
+                const qqNumber = document.getElementById('qqNumber').textContent;
+                
+                // 使用现代剪贴板API
+                navigator.clipboard.writeText(qqNumber).then(() => {
+                    const originalText = this.textContent;
+                    this.innerHTML = '<i class="fas fa-check"></i> 已复制!';
+                    
+                    // 2秒后恢复原状
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                    }, 2000);
+                }).catch(err => {
+                    console.error('复制失败:', err);
+                    alert('复制失败，请手动复制QQ号');
+                });
+            });
+            
+            // 初始化页面内容
+            renderHomeEvents();
+            renderEventsPage();
+            renderFriendsPage();
+            updateCountdown();
+        });
+    </script>
+</body>
+</html>
